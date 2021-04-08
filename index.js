@@ -1,9 +1,8 @@
-const express = require('express');
-const fs = require('fs');
-const cheerio = require('cheerio');
-const app = express();
-var hljs = require('highlight.js'); // https://highlightjs.org/
-var md = require('markdown-it')({
+const express   = require('express');
+const fs        = require('fs');
+const cheerio   = require('cheerio');
+const hljs        = require('highlight.js'); // https://highlightjs.org/
+const md          = require('markdown-it')({
     html: true,
     linkify: true,
     typographer: true,
@@ -15,17 +14,45 @@ var md = require('markdown-it')({
     }
 });
 
+const app = express();
 const port = 80;
-const markdownTemplate = '/public/markdown.html';
-const markdownFolder = '/markdown/';
+const markdownTemplate = 'markdown.html';
+const markdownFolder = 'markdown';
+const mainPage = 'index.html';
 
 app.use(express.static('public'));
 
-app.get('/:file', function(req, res) {
-    var html = fs.readFileSync(__dirname + markdownTemplate, 'utf8');
-    var markup = fs.readFileSync(__dirname + markdownFolder + req.params.file, 'utf8');
+function getMarkdownPages(){
+    let pages = fs.readdirSync(markdownFolder);
+    let list = "";
+    for(let i = 0; i < pages.length; i++){
+        
+        list += '<li><a href="';
+        list += pages[i];
+        list += '">'
+        list += pages[i];
+        list += '</a></li>';
+    }
+    return list;
+}
+
+function getMainPage(req, res){
+    var html = fs.readFileSync(__dirname + "/" + mainPage, 'utf8');
     var $ = cheerio.load(html);
-    var render = md.render(markup);
+    var pages = getMarkdownPages();
+    $('body').append(pages);
+    res.send($.html());
+}
+
+app.get('/', getMainPage);
+app.get('/index.html', getMainPage);
+
+
+app.get('/:file', function(req, res) {
+    var html = fs.readFileSync(__dirname + "/" + markdownTemplate, 'utf8');
+    var markdown = fs.readFileSync(__dirname + "/" + markdownFolder + "/" + req.params.file, 'utf8');
+    var $ = cheerio.load(html);
+    var render = md.render(markdown);
     $('body').append(render);
     res.send($.html());
   });
