@@ -8,7 +8,7 @@ var md = require('markdown-it')({
     typographer: true
 });
 
-const port = 3000;
+const port = 80;
 const markdownTemplate = '/public/markdown.html';
 const markdownFolder = '/markdown/';
 
