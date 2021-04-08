@@ -2,10 +2,20 @@ const express = require('express');
 const fs = require('fs');
 const cheerio = require('cheerio');
 const app = express();
+var hljs = require('highlight.js'); // https://highlightjs.org/
 var md = require('markdown-it')({
     html: true,
     linkify: true,
-    typographer: true
+    typographer: true,
+    highlight: function (str, lang) {
+      if (lang && hljs.getLanguage(lang)) {
+        try {
+          return hljs.highlightAuto(str).value;
+        } catch (__) {}
+      }
+  
+      return ''; // use external default escaping
+    }
 });
 
 const port = 80;
@@ -15,7 +25,6 @@ const markdownFolder = '/markdown/';
 app.use(express.static('public'));
 
 app.get('/:file', function(req, res) {
-    console.log("Params", req.params);
     var html = fs.readFileSync(__dirname + markdownTemplate, 'utf8');
     var markup = fs.readFileSync(__dirname + markdownFolder + req.params.file, 'utf8');
     var $ = cheerio.load(html);
