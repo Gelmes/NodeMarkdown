@@ -7,14 +7,11 @@ var md = require('markdown-it')({
     html: true,
     linkify: true,
     typographer: true,
-    highlight: function (str, lang) {
-      if (lang && hljs.getLanguage(lang)) {
+    highlight: function (str) {
         try {
-          return hljs.highlightAuto(str).value;
+            return hljs.highlightAuto(str).value;
         } catch (__) {}
-      }
-  
-      return ''; // use external default escaping
+        return ''; // use external default escaping
     }
 });
 
