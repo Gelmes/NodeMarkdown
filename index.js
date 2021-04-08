@@ -1,8 +1,9 @@
 const express   = require('express');
 const fs        = require('fs');
+const path      = require('path');
 const cheerio   = require('cheerio');
-const hljs        = require('highlight.js'); // https://highlightjs.org/
-const md          = require('markdown-it')({
+const hljs      = require('highlight.js'); // https://highlightjs.org/
+const md        = require('markdown-it')({
     html: true,
     linkify: true,
     typographer: true,
@@ -26,12 +27,14 @@ function getMarkdownPages(){
     let pages = fs.readdirSync(markdownFolder);
     let list = "";
     for(let i = 0; i < pages.length; i++){
-        
-        list += '<li><a href="';
-        list += pages[i];
-        list += '">'
-        list += pages[i];
-        list += '</a></li>';
+        page = path.parse(pages[i]);
+        if(page.ext == ".md"){
+            list += '<li><a href="';
+            list += page.base;
+            list += '">'
+            list += page.name;
+            list += '</a></li>';
+        }
     }
     return list;
 }
